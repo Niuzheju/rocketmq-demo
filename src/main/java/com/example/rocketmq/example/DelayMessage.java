@@ -15,12 +15,12 @@ import org.slf4j.LoggerFactory;
  * @Author niuzheju
  * @Date 14:12 2024/3/7
  */
-public class SynchronouslyProducer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SynchronouslyProducer.class);
+public class DelayMessage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelayMessage.class);
 
     public static void main(String[] args) throws MQClientException, MQBrokerException, RemotingException, InterruptedException {
         String nameServer = "192.168.56.101:9876";
-        String topic = "MQ_DEMO";
+        String topic = "ORDERLY";
         DefaultMQProducer producer = new DefaultMQProducer("MY_GROUP");
         producer.setNamesrvAddr(nameServer);
         producer.start();

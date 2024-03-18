@@ -1,7 +1,8 @@
 package com.example.rocketmq.example;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
-import org.apache.rocketmq.client.consumer.listener.*;
+import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
+import org.apache.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.message.MessageExt;
@@ -23,7 +24,7 @@ public class OrderlyConsumer {
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         consumer.setNamesrvAddr(nameServer);
         consumer.subscribe(topic, "*");
-        // 顺序消费，一个队列只会被一个线程消费，从前往后消费
+        // 顺序消费
         consumer.registerMessageListener((MessageListenerOrderly) (msgs, context) -> {
             for (MessageExt msg : msgs) {
                 String str = new String(msg.getBody());

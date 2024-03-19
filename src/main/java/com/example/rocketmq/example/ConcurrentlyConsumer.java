@@ -17,25 +17,31 @@ public class ConcurrentlyConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentlyConsumer.class);
 
-    public static void main(String[] args) throws MQClientException {
+    public static void main(String[] args) {
         String nameServer = "192.168.56.101:9876";
-        String topic = "MQ_DEMO";
+        String topic = "BATCH";
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("MY_CONSUMER_GROUP");
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         consumer.setNamesrvAddr(nameServer);
-        consumer.subscribe(topic, "*");
-        // 并发消费
-        consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
-            for (MessageExt msg : msgs) {
-                String str = new String(msg.getBody());
-                int queueId = msg.getQueueId();
-                long queueOffset = msg.getQueueOffset();
+        try {
+            consumer.subscribe(topic, "*");
+            // 并发消费
+            consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
+                for (MessageExt msg : msgs) {
+                    String str = new String(msg.getBody());
+                    int queueId = msg.getQueueId();
+                    long queueOffset = msg.getQueueOffset();
 
-                System.out.println("queueId: " + queueId + " queueOffset: " + queueOffset + " message: " + str);
-            }
-            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-        });
-        consumer.start();
-        LOGGER.info("开始消费。。。");
+                    System.out.println("queueId: " + queueId + " queueOffset: " + queueOffset + " message: " + str);
+                    LOGGER.info("消费到消息, queueId: {}, queueOffset: {}, message: {}", queueId, queueOffset, str);
+                }
+                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+            });
+            consumer.start();
+            LOGGER.info("开始消费。。。");
+        } catch (MQClientException e) {
+            LOGGER.error("并发消费消息发生错误", e);
+        }
+
     }
 }

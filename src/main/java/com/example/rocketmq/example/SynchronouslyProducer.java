@@ -20,7 +20,7 @@ public class SynchronouslyProducer {
 
     public static void main(String[] args) throws MQClientException, MQBrokerException, RemotingException, InterruptedException {
         String nameServer = "192.168.56.101:9876";
-        String topic = "MQ_DEMO";
+        String topic = "PULL";
         DefaultMQProducer producer = new DefaultMQProducer("MY_GROUP");
         producer.setNamesrvAddr(nameServer);
         producer.start();

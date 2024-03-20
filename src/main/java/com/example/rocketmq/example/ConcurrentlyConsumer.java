@@ -6,6 +6,7 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.remoting.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,8 @@ public class ConcurrentlyConsumer {
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("MY_CONSUMER_GROUP");
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         consumer.setNamesrvAddr(nameServer);
+        // 消费模式, 默认集群消费
+        consumer.setMessageModel(MessageModel.CLUSTERING);
         try {
             consumer.subscribe(topic, "*");
             // 并发消费

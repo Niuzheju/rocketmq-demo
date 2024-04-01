@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+rocketmq:
+  consumer:
+    group: SPRINGBOOT_CONSUMER_GROUP
+    pull-batch-size: 50
+  name-server: 192.168.56.101:9876
+  producer:
+    group: SPRINGBOOT_PRODUCER_GROUP
+    send-message-timeout: 5000
+    retry-times-when-send-failed: 3
+    retry-times-when-send-async-failed: 3
+    max-message-size: 4096
+    compress-message-body-threshold: 4096
+    retry-next-server: false
+
+topic:
+  order: ORDER

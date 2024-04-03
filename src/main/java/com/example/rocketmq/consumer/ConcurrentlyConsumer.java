@@ -11,11 +11,15 @@ import org.springframework.stereotype.Component;
  * @Date 15:45 2024/4/1
  */
 @Component
-@RocketMQMessageListener(topic = "${topic.order}", consumerGroup = "${rocketmq.consumer.group}")
-public class MyConsumer implements RocketMQListener<String> {
+@RocketMQMessageListener(topic = "${topic.order}", consumerGroup = "CURRENTLY_GROUP")
+public class ConcurrentlyConsumer implements RocketMQListener<String> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MyConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentlyConsumer.class);
 
+    /**
+     * 并发消费
+     * @param s 消息体
+     */
     @Override
     public void onMessage(String s) {
         LOGGER.info("接受到消息: {}", s);

@@ -1,6 +1,8 @@
 package com.example.rocketmq.controller;
 
 import lombok.Setter;
+import org.apache.rocketmq.client.producer.SendCallback;
+import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +28,65 @@ public class ProducerController {
     @Value("${topic.order}")
     private String orderTopic;
 
+    @Value("${topic.orderly}")
+    private String orderlyTopic;
+
     @PostMapping("/sendNormalMessage")
     public void sendNormalMessage() {
-        Message<String> message = MessageBuilder.withPayload("message, from springboot").build();
-        rocketMQTemplate.send(orderTopic, message);
-        LOGGER.info("消息发送成功...");
+        for (int i = 0; i < 50; i++) {
+            Message<String> message = MessageBuilder.withPayload("message, from springboot" + i).build();
+            rocketMQTemplate.send(orderTopic, message);
+            LOGGER.info("消息发送成功...");
+        }
+    }
+
+    @PostMapping("/sendOrderMessage")
+    public void sendOrderMessage() {
+        for (int i = 0; i < 50; i++) {
+            Message<String> message = MessageBuilder
+                    .withPayload("log, orderNo" + i)
+                    .build();
+            SendResult sendResult = rocketMQTemplate.syncSendOrderly(orderlyTopic + ":tag", message, "log");
+            LOGGER.info("i: {}, queueId: {}", i, sendResult.getMessageQueue().getQueueId());
+        }
+
+        for (int i = 0; i < 50; i++) {
+            Message<String> message = MessageBuilder
+                    .withPayload("logistics, orderNo" + i)
+                    .build();
+            SendResult sendResult = rocketMQTemplate.syncSendOrderly(orderlyTopic, message, "logistics");
+            LOGGER.info("i: {}, queueId: {}", i, sendResult.getMessageQueue().getQueueId());
+        }
+    }
+
+    @PostMapping("/sendAsyncMessage")
+    public void sendAsyncMessage() {
+        for (int i = 0; i < 50; i++) {
+            Message<String> message = MessageBuilder.withPayload("async message" + i).build();
+            int finalI = i;
+            rocketMQTemplate.asyncSend(orderTopic, message, new SendCallback() {
+                @Override
+                public void onSuccess(SendResult sendResult) {
+                    LOGGER.info("异步发送消息成功, i: {}, queueId: {}", finalI, sendResult.getMessageQueue().getQueueId());
+                }
+
+                @Override
+                public void onException(Throwable e) {
+                    LOGGER.error("异步发送消息失败", e);
+
+                }
+            });
+        }
+
+        LOGGER.info("异步发送消息,此方法立即返回");
+    }
+
+    @PostMapping("/sendDelayMessage")
+    public void sendDelayMessage() {
+        for (int i = 0; i < 50; i++) {
+            Message<String> message = MessageBuilder.withPayload("delay message" + i).build();
+            SendResult sendResult = rocketMQTemplate.syncSendDelayTimeSeconds(orderTopic, message, 30);
+            LOGGER.info("i: {}, queueId: {}", i, sendResult.getMessageQueue().getQueueId());
+        }
     }
 }

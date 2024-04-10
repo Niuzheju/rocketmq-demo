@@ -8,3 +8,9 @@ POST http://localhost:8080/sendAsyncMessage
 
 ###
 POST http://localhost:8080/sendDelayMessage
+
+###
+POST http://localhost:8080/sendNormalMessageWithObject
+
+###
+POST http://localhost:8080/sendTransactionMessage
